@@ -1,0 +1,999 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Simple Static Energy and Force Calculation Using <code>QUICKSTEP</code></title>
+<!-- 2014-01-27 Mon 01:47 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Lianheng Tong" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+
+<style type="text/css">
+/*<![CDATA[*/
+  .textsc {font-variant: small-caps;}
+/*]]*/
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+<!-- The org-mode default configuration, with some of my modifications -->
+<script type="text/x-mathjax-config">
+/*<![CDATA[*/
+  MathJax.Hub.Config({
+    // Only one of the two following lines, depending on user settings
+    // First allows browser-native MathML display, second forces HTML/CSS
+        config: ["MMLorHTML.js"], jax: ["input/TeX"],
+    //  jax: ["input/TeX", "output/HTML-CSS"],
+    extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                 "TeX/noUndefined.js"],
+    tex2jax: {
+      inlineMath: [ ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"],
+                     ["\\begin{displaymath}","\\end{displaymath}"] ],
+      skipTags: ["script","noscript","style","textarea","pre","code"],
+      ignoreClass: "tex2jax_ignore",
+      processEscapes: false,
+      processEnvironments: true,
+      preview: "TeX"
+    },
+    showProcessingMessages: true,
+    displayAlign: "center",
+    displayIndent: "2em",
+
+    "HTML-CSS": {
+      scale: 100,
+      availableFonts: ["STIX","TeX"],
+      preferredFont: "TeX",
+      webFont: "TeX",
+      imageFont: "TeX",
+      showMathMenu: true,
+    },
+    MMLorHTML: {
+      prefer: {
+        MSIE:    "MML",
+        Firefox: "MML",
+        Opera:   "HTML",
+        Safari:  "HTML",
+        other:   "HTML"
+      }
+    }
+  });
+/*]]>*/
+</script>
+
+<!-- switching on equation numbers support -->
+<script type="text/x-mathjax-config">
+/*<![CDATA[*/
+  MathJax.Hub.Config({
+    TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+/*]]>*/
+</script>
+
+<!-- Loading mathjax javascript using preamble and my math definitions -->
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Simple Static Energy and Force Calculation Using <code>QUICKSTEP</code></h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Introduction</a></li>
+<li><a href="#sec-2">2. Input Files</a></li>
+<li><a href="#sec-3">3. Running the Calculation</a></li>
+<li><a href="#sec-4">4. Obtaining the Results</a></li>
+<li><a href="#sec-5">5. Adding Smearing</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+In this tutorial, we are going to show the reader how to perform a
+simple static self-consistent Kohn-Sham Density Functional Theory
+energy and force calculation on a system using <code>QUICKSTEP</code>.
+</p>
+
+<p>
+We will use face centred cubic bulk Si, with 8 atoms in a cubic unit
+cell as an example. The example files are contained in
+<code>static_calculation.tgz</code>. The calculations were carried out with
+<code>CP2K</code> SVN trunk revision 13180.
+</p>
+
+<p>
+The reader should note that the integration grid settings used in
+the example calculations have already chosen to be sufficient for
+the given accuracy. A separate <i>tutorial</i> is available to show how to
+achieve this.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Input Files</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+We first look at the input files required for this calculation. The
+necessary input files are:
+</p>
+
+<ul class="org-ul">
+<li><code>Si_bulk8.inp</code>: the main input file for the calculation, which
+defines the system and the job parameters
+</li>
+<li><code>BASIS_SET</code>: file containing parameters for the basis sets that
+can be used by <code>CP2K</code> for this calculation
+</li>
+<li><code>POTENTIAL</code>: file containing parameters for the pseudopotentials
+that can be used by <code>CP2K</code> for this calculation
+</li>
+</ul>
+
+<p>
+A list of basis set and pseudopotential files may be found in
+<code>cp2k/tests/QS/</code> that comes with a <code>cp2k</code> source release. These
+should cover most of the commonly used elements. The user will,
+however, need to produce their own main input file for a given
+calculation.
+</p>
+
+<p>
+Let us look at the main input: <code>Si_bulk8.inp</code> in detail. The name of
+this file can be arbitrary, so is the file extension. The input file
+is structured into ordered blocks and keywords, the order of which
+are unimportant. Each input block is referred to as a "section" in
+this tutorial, and some sections are "subsections" of other
+sections. Full definitions of the input file format and keywords is
+available via the <a href="http://manual.cp2k.org/trunk/index.html"><code>CP2K</code> input reference manual</a>.
+</p>
+
+<p>
+The input file is shown below:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;GLOBAL</span>
+  <span style="color: #859900; font-weight: bold;">PROJECT</span> Si_bulk8
+  <span style="color: #859900; font-weight: bold;">RUN_TYPE</span> ENERGY_FORCE
+  <span style="color: #859900; font-weight: bold;">PRINT_LEVEL</span> LOW
+<span style="color: #268bd2;">&amp;END GLOBAL</span>
+<span style="color: #268bd2;">&amp;FORCE_EVAL</span>
+  <span style="color: #859900; font-weight: bold;">METHOD</span> Quickstep
+  <span style="color: #268bd2;">&amp;SUBSYS</span>
+    <span style="color: #268bd2;">&amp;KIND</span> Si
+      <span style="color: #859900; font-weight: bold;">ELEMENT</span>   Si
+      <span style="color: #859900; font-weight: bold;">BASIS_SET</span> DZVP-GTH-PADE
+      <span style="color: #859900; font-weight: bold;">POTENTIAL</span> GTH-PADE-q4
+    <span style="color: #268bd2;">&amp;END KIND</span>
+    <span style="color: #268bd2;">&amp;CELL</span>
+      <span style="color: #859900; font-weight: bold;">A</span>     5.430697500    0.000000000    0.000000000
+      <span style="color: #859900; font-weight: bold;">B</span>     0.000000000    5.430697500    0.000000000
+      <span style="color: #859900; font-weight: bold;">C</span>     0.000000000    0.000000000    5.430697500
+    <span style="color: #268bd2;">&amp;END CELL</span>
+    <span style="color: #268bd2;">&amp;COORD</span>
+      <span style="color: #859900; font-weight: bold;">Si</span>    0.000000000    0.000000000    0.000000000
+      <span style="color: #859900; font-weight: bold;">Si</span>    0.000000000    2.715348700    2.715348700
+      <span style="color: #859900; font-weight: bold;">Si</span>    2.715348700    2.715348700    0.000000000
+      <span style="color: #859900; font-weight: bold;">Si</span>    2.715348700    0.000000000    2.715348700
+      <span style="color: #859900; font-weight: bold;">Si</span>    4.073023100    1.357674400    4.073023100
+      <span style="color: #859900; font-weight: bold;">Si</span>    1.357674400    1.357674400    1.357674400
+      <span style="color: #859900; font-weight: bold;">Si</span>    1.357674400    4.073023100    4.073023100
+      <span style="color: #859900; font-weight: bold;">Si</span>    4.073023100    4.073023100    1.357674400
+    <span style="color: #268bd2;">&amp;END COORD</span>
+  <span style="color: #268bd2;">&amp;END SUBSYS</span>
+  <span style="color: #268bd2;">&amp;DFT</span>
+    <span style="color: #859900; font-weight: bold;">BASIS_SET_FILE_NAME</span>  BASIS_SET
+    <span style="color: #859900; font-weight: bold;">POTENTIAL_FILE_NAME</span>  GTH_POTENTIALS
+    <span style="color: #268bd2;">&amp;QS</span>
+      <span style="color: #859900; font-weight: bold;">EPS_DEFAULT</span> 1.0E-10
+    <span style="color: #268bd2;">&amp;END QS</span>
+    <span style="color: #268bd2;">&amp;MGRID</span>
+      <span style="color: #859900; font-weight: bold;">NGRIDS</span> 4
+      <span style="color: #859900; font-weight: bold;">CUTOFF</span> 300
+      <span style="color: #859900; font-weight: bold;">REL_CUTOFF</span> 60
+    <span style="color: #268bd2;">&amp;END MGRID</span>
+    <span style="color: #268bd2;">&amp;XC</span>
+      <span style="color: #268bd2;">&amp;XC_FUNCTIONAL</span> PADE
+      <span style="color: #268bd2;">&amp;END XC_FUNCTIONAL</span>
+    <span style="color: #268bd2;">&amp;END XC</span>
+    <span style="color: #268bd2;">&amp;SCF</span>
+      <span style="color: #859900; font-weight: bold;">SCF_GUESS</span> ATOMIC
+      <span style="color: #859900; font-weight: bold;">EPS_SCF</span> 1.0E-7
+      <span style="color: #859900; font-weight: bold;">MAX_SCF</span> 300
+      <span style="color: #268bd2;">&amp;DIAGONALIZATION</span>  ON
+        <span style="color: #859900; font-weight: bold;">ALGORITHM</span> STANDARD
+      <span style="color: #268bd2;">&amp;END DIAGONALIZATION</span>
+      <span style="color: #268bd2;">&amp;MIXING</span>  T
+        <span style="color: #859900; font-weight: bold;">METHOD</span> BROYDEN_MIXING
+        <span style="color: #859900; font-weight: bold;">ALPHA</span> 0.4
+        <span style="color: #859900; font-weight: bold;">NBROYDEN</span> 8
+      <span style="color: #268bd2;">&amp;END MIXING</span>
+    <span style="color: #268bd2;">&amp;END SCF</span>
+  <span style="color: #268bd2;">&amp;END DFT</span>
+  <span style="color: #268bd2;">&amp;PRINT</span>
+    <span style="color: #268bd2;">&amp;FORCES</span> ON
+    <span style="color: #268bd2;">&amp;END FORCES</span>
+  <span style="color: #268bd2;">&amp;END PRINT</span>
+<span style="color: #268bd2;">&amp;END FORCE_EVAL</span>
+</pre>
+</div>
+
+<p>
+The main sections in the input file are:
+</p>
+
+<ul class="org-ul">
+<li><a href="http://manual.cp2k.org/trunk/CP2K_INPUT/GLOBAL.html"><code>GLOBAL</code></a>: contains general options for the <code>CP2K</code> run, such as the
+name of the job, the type of run etc.
+</li>
+<li><a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL.html"><code>FORCE_EVAL</code></a>: contains all parameters associated with the
+evaluation of forces on atoms, this includes the initial atomic
+coordinates.
+</li>
+</ul>
+
+<p>
+We look at each section in detail. The <code>GLOBAL</code> section in
+<code>Si_bulk8.inp</code> is presented below:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;GLOBAL</span>
+  <span style="color: #859900; font-weight: bold;">PROJECT</span> Si_bulk8
+  <span style="color: #859900; font-weight: bold;">RUN_TYPE</span> ENERGY_FORCE
+  <span style="color: #859900; font-weight: bold;">PRINT_LEVEL</span> LOW
+<span style="color: #268bd2;">&amp;END GLOBAL</span>
+</pre>
+</div>
+
+<p>
+We will be doing a static energy and force calculation, in this
+case, we must set <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/GLOBAL.html#desc_RUN_TYPE"><code>RUNTYPE</code></a> to <code>ENERGY_FORCE</code>. Keyword <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/GLOBAL.html#desc_PROJECT_NAME"><code>PROJECT</code></a> is an
+alias for <code>PROJECT_NAME</code>, which sets the root-name of the
+calculation, in this case <code>Si_bulk8</code>. Any output files automatically
+generated by <code>CP2K</code> will have the name prefixed by
+<code>Si_bulk8</code>. <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/GLOBAL.html#desc_PRINT_LEVEL"><code>PRINT_LEVEL</code></a> controls the default verbosity of the main
+output of <code>CP2K</code>, in this example, it is set to "low". The
+verbosity of the output can be fine-tuned by overriding this setting
+in each individual subsection of the input.
+</p>
+
+<p>
+We now explain the section <code>FORCE_EVAL</code> line-by-line.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #859900; font-weight: bold;">METHOD</span> Quickstep
+</pre>
+</div>
+
+<p>
+The keyword <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL.html#desc_METHOD"><code>METHOD</code></a> chooses the method for evaluating the forces on
+atoms to <code>QUICKSTEP</code>, i.e. Density Functional Theory using the
+Gaussian and Planewaves (GPW) method.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;SUBSYS</span>
+  <span style="color: #268bd2;">&amp;KIND</span> Si
+    <span style="color: #859900; font-weight: bold;">ELEMENT</span>   Si
+    <span style="color: #859900; font-weight: bold;">BASIS_SET</span> DZVP-GTH-PADE
+    <span style="color: #859900; font-weight: bold;">POTENTIAL</span> GTH-PADE-q4
+  <span style="color: #268bd2;">&amp;END KIND</span>
+  <span style="color: #268bd2;">&amp;CELL</span>
+    <span style="color: #859900; font-weight: bold;">A</span>     5.430697500    0.000000000    0.000000000
+    <span style="color: #859900; font-weight: bold;">B</span>     0.000000000    5.430697500    0.000000000
+    <span style="color: #859900; font-weight: bold;">C</span>     0.000000000    0.000000000    5.430697500
+  <span style="color: #268bd2;">&amp;END CELL</span>
+  <span style="color: #268bd2;">&amp;COORD</span>
+    <span style="color: #859900; font-weight: bold;">Si</span>    0.000000000    0.000000000    0.000000000
+    <span style="color: #859900; font-weight: bold;">Si</span>    0.000000000    2.715348700    2.715348700
+    <span style="color: #859900; font-weight: bold;">Si</span>    2.715348700    2.715348700    0.000000000
+    <span style="color: #859900; font-weight: bold;">Si</span>    2.715348700    0.000000000    2.715348700
+    <span style="color: #859900; font-weight: bold;">Si</span>    4.073023100    1.357674400    4.073023100
+    <span style="color: #859900; font-weight: bold;">Si</span>    1.357674400    1.357674400    1.357674400
+    <span style="color: #859900; font-weight: bold;">Si</span>    1.357674400    4.073023100    4.073023100
+    <span style="color: #859900; font-weight: bold;">Si</span>    4.073023100    4.073023100    1.357674400
+  <span style="color: #268bd2;">&amp;END COORD</span>
+<span style="color: #268bd2;">&amp;END SUBSYS</span>
+</pre>
+</div>
+
+<p>
+The subsection <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS.html"><code>SUBSYS</code></a> defines the simulation unit cell and the
+initial coordinates of atoms in the calculation. 
+</p>
+
+<p>
+The subsection <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/KIND.html"><code>KIND</code></a> gives definitions of elements in the
+calculation. There must be one <code>KIND</code> subsection per element. In
+this example, for Si, we have defined the basis set to be used:
+<code>DZVP_GTH-PADE</code> (double-\(\zeta\) with polarisation basis optimised
+for Geodecker-Teter-Hutter PADE LDA pseudopotential); and the
+pseudopotential: <code>GTH-PADE-q4</code> (Geodecker-Teter-Hutter PADE LDA
+pseudopotential with 4 valence electrons).
+</p>
+
+<p>
+The basis set and pseudopotential names <i>must</i> correspond to an
+existing entry in the corresponding basis set and pseudopotential
+files defined by <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT.html#desc_BASIS_SET_FILE_NAME"><code>BASIS_SET_FILE_NAME</code></a> and <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT.html#desc_POTENTIAL_FILE_NAME"><code>POTENTIAL_FILE_NAME</code></a>
+keywords in <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT.html"><code>DFT</code></a> subsection, in <code>FORCE_EVAL</code> section. The chosen
+basis for Si corresponds to parameters:
+</p>
+
+<pre class="example">
+Si DZVP-GTH-PADE
+  2
+  3  0  1  4  2  2
+        1.2032422345   0.3290350445   0.0000000000   0.0474539126   0.0000000000
+        0.4688409786  -0.2533118323   0.0000000000  -0.2594473573   0.0000000000
+        0.1679863234  -0.7870946277   0.0000000000  -0.5440929303   0.0000000000
+        0.0575619526  -0.1909898479   1.0000000000  -0.3624010364   1.0000000000
+  3  2  2  1  1
+        0.4500000000   1.0000000000
+</pre>
+
+<p>
+in file <code>BASIS_SETS</code>; and the chosen pseudopotential corresponds to
+parameters:
+</p>
+
+<pre class="example">
+Si GTH-PADE-q4 GTH-LDA-q4
+    2    2
+     0.44000000    1    -7.33610297
+    2
+     0.42273813    2     5.90692831    -1.26189397
+                                        3.25819622
+     0.48427842    1     2.72701346
+</pre>
+
+<p>
+in file <code>GTH_POTENTIAL</code>.
+</p>
+
+<p>
+The subsection <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/CELL.html"><code>CELL</code></a> defines the simulation unit cell used in a
+calculation.  In this example, we define the unit cell as cubic,
+with lattice constant equal to 5.4306975 Angstroms. "Angstrom" is
+the default unit for cell vectors. <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/CELL.html#desc_A"><code>A</code></a>, <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/CELL.html#desc_B"><code>B</code></a> and <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/CELL.html#desc_C"><code>C</code></a> are the first,
+second and third lattice (cell) vectors. There are many ways to
+define the cell, see <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/CELL.html"><code>CP2K</code> input reference manual</a> for more details.
+</p>
+
+<p>
+The initial atomic coordinates are specified in the <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/COORD.html"><code>COORD</code></a>
+subsection. The default input format for atomic coordinates in
+<code>CP2K</code> is:
+</p>
+<pre class="example">
+&lt;ATOM_KIND&gt; X Y Z
+</pre>
+<p>
+where <code>X</code>, <code>Y</code> and <code>Z</code> are Cartesian coordinates in Angstroms. This
+can be changed by configuring keyword <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/COORD.html#desc_SCALED"><code>SCALED</code></a> to <code>.TRUE.</code>, in the
+<code>COORD</code> subsection, which makes the coordinate input <code>X</code> <code>Y</code> <code>Z</code> to
+be fractional with respect to the lattice vectors. One can also
+change the unit for the Cartesian coordinates by setting the keyword
+<a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/COORD.html#desc_UNIT"><code>UNIT</code></a> with in the subsection. <code>&lt;ATOM_KIND&gt;</code> should be a label that
+corresponds to the definition of the elements in the <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/SUBSYS/KIND.html"><code>KIND</code></a>
+subsections.
+</p>
+
+<p>
+After the <code>SUBSYS</code> section in the input file <code>Si_bulk8.inp</code> follows
+the <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT.html"><code>DFT</code></a> subsection, which controls all aspects of the
+self-consistent Kohn-Sham Density Functional Theory
+calculation. This subsection is only relevant if and only if the
+<code>METHOD</code> keyword in <code>FORCE_EVAL</code> is set to <code>QUICKSTEP</code>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #859900; font-weight: bold;">BASIS_SET_FILE_NAME</span>  BASIS_SET
+<span style="color: #859900; font-weight: bold;">POTENTIAL_FILE_NAME</span>  GTH_POTENTIALS
+</pre>
+</div>
+
+<p>
+As already mentioned above, the keywords <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT.html#desc_BASIS_SET_FILE_NAME"><code>BASIS_SET_FILE_NAME</code></a> and
+<a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT.html#desc_POTENTIAL_FILE_NAME"><code>POTENTIAL_FILE_NAME</code></a> set the files that contains basis set and
+pseudopotential parameters.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;QS</span>
+  <span style="color: #859900; font-weight: bold;">EPS_DEFAULT</span> 1.0E-10
+<span style="color: #268bd2;">&amp;END QS</span>
+</pre>
+</div>
+
+<p>
+The <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/QS.html"><code>QS</code></a> subsection contains general control parameters used by
+<code>QUICKSTEP</code>. <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/QS.html#desc_EPS_DEFAULT"><code>EPS_DEFAULT</code></a> sets the default value for all tolerances
+used within <code>QUICKSTEP</code>. The individual tolerances (<code>EPS_*</code>) can be
+set, and they will override the <code>EPS_DEFAULT</code> value.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;MGRID</span>
+  <span style="color: #859900; font-weight: bold;">NGRIDS</span> 4
+  <span style="color: #859900; font-weight: bold;">CUTOFF</span> 300
+  <span style="color: #859900; font-weight: bold;">REL_CUTOFF</span> 60
+<span style="color: #268bd2;">&amp;END MGRID</span>
+</pre>
+</div>
+
+<p>
+The <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/MGRID.html"><code>MGRID</code></a> subsection defines how the integration grid used in
+<code>QUICKSTEP</code> calculations should be setup. <code>QUICKSTEP</code> uses a
+multi-grid method for representing Gaussian functions numerically on
+the grid. Narrow and sharp Gaussians are mapped onto a finer grid
+than wider and smoother Gaussians. In this case, we are telling the
+code to set up 4 levels of multi-grids, with the planewave cutoff of
+the finest grid set to be 300 Ry, and with the grid spacing
+underneath any Gaussian functions to be finer than the equivalent
+planewave cutoff of 60 Ry. The users should read the tutorial
+"<i>Converging the CUTOFF and REL_CUTOFF</i>" for details on how these
+parameters affect the grid constructed, and how to define a
+sufficient grid for their calculation. In this example, the grid
+defined has already been found to be sufficient for the energy and
+force calculation.
+</p>
+
+<p>
+The <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/XC.html"><code>XC</code></a> subsection follows:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;XC</span>
+  <span style="color: #268bd2;">&amp;XC_FUNCTIONAL</span> PADE
+  <span style="color: #268bd2;">&amp;END XC_FUNCTIONAL</span>
+<span style="color: #268bd2;">&amp;END XC</span>
+</pre>
+</div>
+
+<p>
+This defines which exchange-correlation density functional we want
+to use. In this we choose PADE LDA functional, which is consistent
+with the basis set and pseudopotential we have chosen.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;SCF</span>
+  <span style="color: #859900; font-weight: bold;">SCF_GUESS</span> ATOMIC
+  <span style="color: #859900; font-weight: bold;">EPS_SCF</span> 1.0E-7
+  <span style="color: #859900; font-weight: bold;">MAX_SCF</span> 300
+  <span style="color: #268bd2;">&amp;DIAGONALIZATION</span>
+    <span style="color: #859900; font-weight: bold;">ALGORITHM</span> STANDARD
+  <span style="color: #268bd2;">&amp;END DIAGONALIZATION</span>
+  <span style="color: #268bd2;">&amp;MIXING</span>
+    <span style="color: #859900; font-weight: bold;">METHOD</span> BROYDEN_MIXING
+    <span style="color: #859900; font-weight: bold;">ALPHA</span> 0.4
+    <span style="color: #859900; font-weight: bold;">NBROYDEN</span> 8
+  <span style="color: #268bd2;">&amp;END MIXING</span>
+<span style="color: #268bd2;">&amp;END SCF</span>
+</pre>
+</div>
+
+<p>
+The <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF.html"><code>SCF</code></a> subsection defines all the settings related to methods
+used to find a self-consistent solution of the Kohn-Sham DFT
+formalism.
+</p>
+
+<p>
+<a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF.html#desc_SCF_GUESS"><code>SCF_GUESS</code></a> sets how the initial trial electron density function
+\(\rho(\vec{r})\) is to be generated. In this example (<code>ATOMIC</code>), the
+initial density is to be generated using overlapping of atomic
+charge densities. A good starting point for the electron density in
+the self-consistency loop is important in obtaining a convergent
+result quickly.  <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF.html#desc_EPS_SCF"><code>EPS_SCF</code></a> sets the tolerance of the charge density
+residual. This overrides the <code>EPS_DEFAULT</code> value set in <code>QS</code>
+subsection. <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF.html#desc_MAX_SCF"><code>MAX_SCF</code></a> sets the maximum number of self-consistency
+loops <code>QUICKSTEP</code> is allowed to perform for each ground-state energy
+calculation.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;DIAGONALIZATION</span>  ON
+  <span style="color: #859900; font-weight: bold;">ALGORITHM</span> STANDARD
+<span style="color: #268bd2;">&amp;END DIAGONALIZATION</span>
+</pre>
+</div>
+
+<p>
+The <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/DIAGONALIZATION.html"><code>DIAGONALIZATION</code></a> subsection tells the code to use the
+traditional diagonalisation method for finding the ground state
+Kohn-Sham energy and electron density. The subsection heading also
+takes an argument, and in this case is set to "<code>ON</code>", which
+equivalent to "<code>.TRUE.</code>" or "<code>T</code>", and indicates that the
+diagonalisation method is turned on. One can also omit the value of
+the subsection heading, which defaults to "<code>.TRUE.</code>". The
+alternative to diagonalisation is to use the Orbital Transform (OT)
+method, in which case, the user should either delete the
+<code>DIAGONALIZATION</code> block or change "<code>ON</code>" to "<code>OFF</code>" (or
+"<code>.FALSE.</code>"), and add the <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/DIAGONALIZATION/OT.html"><code>OT</code></a> subsection instead. The <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/DIAGONALIZATION.html#desc_ALGORITHM"><code>ALGORITHM</code></a>
+keyword sets the algorithm to use for diagonalisation of the
+Kohn-Sham Hamiltonian. "<code>STANDARD</code>" means the standard
+LAPACK/SCALAPACK subroutines are to be used for diagonalisation.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;MIXING</span>  T
+  <span style="color: #859900; font-weight: bold;">METHOD</span> BROYDEN_MIXING
+  <span style="color: #859900; font-weight: bold;">ALPHA</span> 0.4
+  <span style="color: #859900; font-weight: bold;">NBROYDEN</span> 8
+<span style="color: #268bd2;">&amp;END MIXING</span>
+</pre>
+</div>
+
+<p>
+The <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/MIXING.html"><code>MIXING</code></a> subsection contains all the parameters associated with
+charge mixing in a self-consistency calculation. The subsection also
+admits a value, which can be either <code>.TRUE.</code> (<code>T</code>) or <code>.FALSE.</code>
+(<code>F</code>), which switches charge mixing on or off. The default is
+<code>.TRUE.</code>. Note that this subsection <i>only applies to the traditional
+diagonalisation method</i>. The OT method uses a different approach for
+charge mixing, and is explained in other tutorials. The keyword
+<a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/MIXING.html#desc_ALPHA"><code>ALPHA</code></a> sets the mixing parameter; in this example 0.4 of the output
+density will be mixed with 0.6 of the input density to form the new
+input density in the next SCF iteration. The keyword <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/MIXING.html#desc_METHOD"><code>METHOD</code></a> sets
+the mixing method; in this case, we will use Broyden mixing. The
+keyword <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/MIXING.html#desc_NBUFFER"><code>NBROYDEN</code></a> is an alias to the parameter <code>NBUFFER</code>, and it
+sets the number of histories to be used in the Broyden mixing
+algorithm.
+</p>
+
+<p>
+The final <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/PRINT.html"><code>PRINT</code></a> subsection in <code>FORCE_EVAL</code> section:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;PRINT</span>
+  <span style="color: #268bd2;">&amp;FORCES</span> ON
+  <span style="color: #268bd2;">&amp;END FORCES</span>
+<span style="color: #268bd2;">&amp;END PRINT</span>
+</pre>
+</div>
+
+<p>
+tells <code>CP2K</code>, in this case, to print out atomic forces in the main
+output of the calculation.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Running the Calculation</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+To run the calculation, the reader needs to have a working <code>CP2K</code>
+package compiled, and with the path to its binaries in the system
+<code>PATH</code>. The files <code>Si_bulk8.inp</code>, <code>BASIS_SET</code> and <code>GTH_POTENTIAL</code>
+should be in the same working directory. In this example, we will
+use the MPI version of <code>CP2K</code>. Type command:
+</p>
+<pre class="example">
+mpirun -n 2 -o Si_bulk8.out Si_bulk8.inp &amp;
+</pre>
+<p>
+in the working directory to run <code>CP2K</code> in parallel with 2 MPI
+processes in the background. The <code>-o</code> option redirects the <code>CP2K</code>
+output to file <code>Si_bulk8.out</code>. Note that the <code>-o</code> option <i>appends</i>
+output of successive runs to <code>Si_bulk8.out</code>, so if the reader wants
+to start completely from afresh, they must delete <code>Si_bulk8.out</code>
+before running a new calculation.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Obtaining the Results</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+After the job has finished, we should obtain the following files:
+</p>
+
+<ul class="org-ul">
+<li><code>Si_bulk8.out</code>
+</li>
+<li><code>Si_bulk8-RESTART.wfn</code>
+</li>
+<li><code>Si_bulk8-RESTART.wfn.bak-1</code>
+</li>
+</ul>
+
+<p>
+The file <code>Si_bulk8.out</code> contains the main output of the
+job. <code>Si_bulk8-RESTART.wfn</code> is the final Kohn-Sham wavefunctions
+from the calculation. <code>Si_bulk8-RESTART.wfn.bak-&lt;n&gt;</code> records the
+Kohn-Sham wavefunctions obtained from the <code>&lt;n&gt;</code>-th previous SCF
+step; in this case, <code>Si_bulk8-RESTART.wfn.bak-1</code> contains the
+wavefunctions obtained from the last SCF step. Should the reader
+want to start a new calculation from the previous calculated
+wavefunctions, they need to change the <code>SCF_GUESS</code> keyword in <code>SCF</code>
+subsection of <code>FORCE_EVAL</code> section to <code>RESTART</code>:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #859900; font-weight: bold;">SCF_GUESS</span> RESTART
+</pre>
+</div>
+<p>
+provided that the new calculation shares the same <code>PROJECT_NAME</code> as
+the one that generated the wavefunctions. Otherwise, we would need
+to rename the restart wavefunction files to correspond to the
+project name of the new calculation.
+</p>
+
+<p>
+We now look at the main <code>CP2K</code> output in more detail.
+</p>
+
+<pre class="example">
+Number of electrons:                                                         32
+Number of occupied orbitals:                                                 16
+Number of molecular orbitals:                                                16
+
+Number of orbital functions:                                                104
+Number of independent orbital functions:                                    104
+
+Extrapolation method: initial_guess
+
+
+SCF WAVEFUNCTION OPTIMIZATION
+
+ Step     Update method      Time    Convergence         Total energy    Change
+ ------------------------------------------------------------------------------
+    1 NoMix/Diag. 0.40E+00    0.6     0.75558724       -32.2320848878 -3.22E+01
+    2 Broy./Diag. 0.40E+00    1.1     0.05667976       -31.1418135481  1.09E+00
+    3 Broy./Diag. 0.40E+00    1.1     0.09691469       -31.1974003416 -5.56E-02
+    4 Broy./Diag. 0.40E+00    1.1     0.00245608       -31.3378474040 -1.40E-01
+    5 Broy./Diag. 0.40E+00    1.1     0.00235460       -31.3009654398  3.69E-02
+    6 Broy./Diag. 0.40E+00    1.1     0.00007565       -31.2972158934  3.75E-03
+    7 Broy./Diag. 0.40E+00    1.1     0.00009004       -31.2977293749 -5.13E-04
+    8 Broy./Diag. 0.40E+00    1.1     0.00000186       -31.2978454163 -1.16E-04
+    9 Broy./Diag. 0.40E+00    1.1     0.00000252       -31.2978835492 -3.81E-05
+   10 Broy./Diag. 0.40E+00    1.1     5.6405E-09       -31.2978852054 -1.66E-06
+
+ *** SCF run converged in    10 steps ***
+</pre>
+
+<p>
+The above shows a typical output from a self-consistent Kohn-Sham
+ground state calculation. It states that we are using
+diagonalisation method with Broyden charge mixing, and it took 10
+Broyden mixing steps (each containing a diagonalisation process to
+obtain the wavefunctions) to reach the required tolerance for
+self-consistency.
+</p>
+
+<pre class="example">
+ Electronic density on regular grids:        -31.9999999889        0.0000000111
+ Core density on regular grids:               31.9999999939       -0.0000000061
+ Total charge density on r-space grids:        0.0000000051
+ Total charge density g-space grids:           0.0000000051
+
+ Overlap energy of the core charge distribution:               0.00000000005320
+ Self energy of the core charge distribution:                -82.06393942512820
+ Core Hamiltonian energy:                                     18.06858429706010
+ Hartree energy:                                              42.41172824581682
+ Exchange-correlation energy:                                 -9.71425832315952
+
+ Total energy:                                               -31.29788520535761
+
+ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):              -31.297885372811002
+
+
+ATOMIC FORCES in [a.u.]
+
+# Atom   Kind   Element          X              Y              Z
+     1      1      Si          0.00000000     0.00000000     0.00000000
+     2      1      Si          0.00000000     0.00000001     0.00000001
+     3      1      Si          0.00000001     0.00000001     0.00000000
+     4      1      Si          0.00000001     0.00000000     0.00000001
+     5      1      Si         -0.00000001    -0.00000001    -0.00000001
+     6      1      Si         -0.00000001    -0.00000001    -0.00000001
+     7      1      Si         -0.00000001    -0.00000001    -0.00000001
+     8      1      Si         -0.00000001    -0.00000001    -0.00000001
+SUM OF ATOMIC FORCES          -0.00000000    -0.00000000    -0.00000000     0.00000000
+</pre>
+
+<p>
+The above shows the results on final energies and forces.  One
+should always check if the total number of electrons calculated from
+the final electron density, in this case 31.9999999939, is correct.
+</p>
+
+<p>
+The results show that the force on the atoms are almost zero. This
+means the system is more or less relaxed, and its geometry is close
+to its optimal at ground state.
+</p>
+</div>
+</div>
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Adding Smearing</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+In the example so far, we have not used any smearing on electron
+occupation. This is fine for system with a large band gap. However,
+for metals or systems with a small gap, this may cause the
+calculation to be unstable, and the self-consistency loop may never
+converge, due to the discontinuity in the electron occupation
+function.
+</p>
+
+<p>
+To add smearing, we need to add the subsection <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF/SMEAR.html"><code>SMEAR</code></a> inside
+subsection <code>SCF</code>:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #268bd2;">&amp;SMEAR</span> ON
+  <span style="color: #859900; font-weight: bold;">METHOD</span> FERMI_DIRAC
+  <span style="color: #859900; font-weight: bold;">ELECTRONIC_TEMPERATURE</span> [K] 300
+<span style="color: #268bd2;">&amp;END SMEAR</span>
+</pre>
+</div>
+
+<p>
+This tells <code>QUICKSTEP</code> to use a smearing function for the electron
+occupation. In this example, we use the Fermi-Dirac smearing
+function, with the electron temperature being set to 300 K. Note
+that, in <code>CP2K</code>, one can explicitly define the unit of a given input
+value by using a unit enclosed in square bracket, such as "<code>[K]</code>",
+before the value.
+</p>
+
+<p>
+This is not all, since smearing may lead to occupation of molecular
+orbitals in the conduction band, we must tell <code>CP2K</code> to include
+extra, empty, molecular orbitals into the calculation, which
+otherwise would be omitted (for reducing computational cost). To do
+this, we need to add the keyword <a href="http://manual.cp2k.org/trunk/CP2K_INPUT/FORCE_EVAL/DFT/SCF.html#desc_ADDED_MOS"><code>ADDED_MOS</code></a> in the <code>SCF</code>
+subsection:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-cp2k"><span style="color: #859900; font-weight: bold;">ADDED_MOS</span> 10
+</pre>
+</div>
+
+<p>
+In this example, we have asked <code>CP2K</code> to not to omit 10 of the
+lowest empty molecular orbitals in the calculation. It should be
+noted that given a chosen basis set, there is a maximum number of
+molecular orbitals, i.e. the number of eigenvectors of the
+Hamiltonian, one can generate. In theory, the maximum should be the
+rank of the Hamiltonian generated in the calculation.
+</p>
+
+<p>
+In the output of the calculation using smearing, we first notice
+that:
+</p>
+
+<pre class="example">
+Number of electrons:                                                         32
+Number of occupied orbitals:                                                 16
+Number of molecular orbitals:                                                26
+
+Number of orbital functions:                                                104
+Number of independent orbital functions:                                    104
+</pre>
+
+<p>
+unlike in the previous case with no smearing, now 26 molecular
+orbitals have been used during the calculation. There are a total of
+104 basis functions ("atom centred orbitals" spanned by Cartesian
+Gaussians) used in the calculation for the given basis set, so 26 is
+well within the limit of the calculation.
+</p>
+
+<pre class="example">
+ Electronic density on regular grids:        -31.9999999889        0.0000000111
+ Core density on regular grids:               31.9999999939       -0.0000000061
+ Total charge density on r-space grids:        0.0000000051
+ Total charge density g-space grids:           0.0000000051
+
+ Overlap energy of the core charge distribution:               0.00000000005320
+ Self energy of the core charge distribution:                -82.06393942512820
+ Core Hamiltonian energy:                                     18.06842027191411
+ Hartree energy:                                              42.41184371469986
+ Exchange-correlation energy:                                 -9.71419454555998
+ Electronic entropic energy:                                  -0.00001687947145
+ Fermi energy:                                                 0.20867150262130
+
+ Total energy:                                               -31.29788686349247
+
+ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):              -31.297887031736590
+</pre>
+
+<p>
+In the final energy section of the output, we notice that there is
+an extra entropy \((TS)\) term:
+</p>
+
+<pre class="example">
+Electronic entropic energy:                                  -0.00001687947145
+</pre>
+
+<p>
+This should be small for the calculation to be a reliable
+approximation to the zero electron temperature result. The final
+free energy is the sum of the total DFT energy and the entropic
+energy. The total DFT energy is given by:
+</p>
+
+<pre class="example">
+Total energy:                                               -31.29788686349247
+</pre>
+
+<p>
+and the final free energy extrapolated for \(TS \to 0\) is given by:
+</p>
+
+<pre class="example">
+ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):              -31.297887031736590
+</pre>
+
+<p>
+This is the energy to be quoted as the final result.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: Sunday, 2014/01/26</p>
+<p class="author">Author: Lianheng Tong</p>
+<p class="date">Created: 2014-01-27 Mon 01:47</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.5g)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
