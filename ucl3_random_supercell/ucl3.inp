@@ -9,20 +9,31 @@
   &DFT
     BASIS_SET_FILE_NAME BASIS_MOLOPT
     POTENTIAL_FILE_NAME GTH_POTENTIALS
+    PLUS_U_METHOD LOWDIN
+    UKS T
 
     &MGRID
-      CUTOFF 400
-      REL_CUTOFF 60
+      NGRIDS 4
+      CUTOFF 300
+      REL_CUTOFF 50
     &END MGRID
 
     &QS
-      EPS_DEFAULT 1.0E-8
+      EPS_DEFAULT 1.0E-10
     &END QS
 
     &SCF
-      EPS_SCF 1.0E-7
-      MAX_SCF 200
-      SCF_GUESS ATOMIC
+      EPS_SCF      1.0E-7
+      MAX_SCF      200
+      SCF_GUESS    ATOMIC
+
+      &OT ON
+        PRECONDITIONER FULL_SINGLE_INVERSE
+        MINIMIZER DIIS
+        ENERGY_GAP 1
+	    STEPSIZE 0.5
+      &END OT
+    
     &END SCF
 
     &XC
@@ -34,18 +45,19 @@
 
   &SUBSYS
     &CELL
-      ABC 10.0 10.0 10.0
-      PERIODIC XYZ
+      ABC 12.4 12.4 12.4
     &END CELL
 
-    &COORD
-      @INCLUDE 'coord.inp'
-    &END COORD
+    @INCLUDE 'coord.inp'
 
     &KIND U
       ELEMENT U
       BASIS_SET DZVP-MOLOPT-GTH-q14
       POTENTIAL GTH-PBE-q14
+      &DFT_PLUS_U on
+        L            3             ! Angular momentum quantum number, 3 for f orbitals
+        U_MINUS_J    4.0*0.03675   ! 4.0 eV → 0.147 Ha
+      &END DFT_PLUS_U
     &END KIND
 
     &KIND Cl

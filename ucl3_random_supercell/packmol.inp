@@ -3,6 +3,6 @@ filetype xyz
 output ucl3_random.xyz
 
 structure ucl3.xyz
-  number 1
-  inside box 0. 0. 0. 10 10 10
+  number 16
+  inside box 0. 0. 0. 12.381989681226788 12.381989681226788 12.381989681226788
 end structure
