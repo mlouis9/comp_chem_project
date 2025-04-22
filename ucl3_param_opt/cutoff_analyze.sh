@@ -1,12 +1,12 @@
 #!/bin/bash
  
-cutoffs="50 100 150 200 250 300 350 400 450 500"
+cutoffs="250 300 350 400 450 500 550 600 650 700 750 800 850 900"
  
 input_file=ucl3.inp
 output_file=ucl3.out
 plot_file=cutoff_data.ssv
  
-rel_cutoff=120
+rel_cutoff=60
  
 echo "# Grid cutoff vs total energy" > $plot_file
 echo "# Date: $(date)" >> $plot_file

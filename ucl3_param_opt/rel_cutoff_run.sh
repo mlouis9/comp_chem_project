@@ -1,6 +1,6 @@
 #!/bin/bash
  
-rel_cutoffs="10 20 30 40 50 60 70 80 90 100"
+rel_cutoffs="60 70 80 90 100 110 120 130 140 150"
  
 cp2k_bin=cp2k.popt
 input_file=ucl3.inp

@@ -9,31 +9,33 @@
   &DFT
     BASIS_SET_FILE_NAME BASIS_MOLOPT
     POTENTIAL_FILE_NAME GTH_POTENTIALS
+    PLUS_U_METHOD LOWDIN
+    UKS T
 
     &MGRID
-      NGRIDS 4
+      NGRIDS 5
       CUTOFF 100
-      REL_CUTOFF 120
+      REL_CUTOFF 40
     &END MGRID
 
     &QS
-      EPS_DEFAULT 1.0E-8
+      EPS_DEFAULT 1.0E-10
     &END QS
 
     &SCF
-      EPS_SCF 1.0E-7
-      MAX_SCF 1
+      EPS_SCF      1.0E-7
+      MAX_SCF      1
       IGNORE_CONVERGENCE_FAILURE TRUE
-      SCF_GUESS ATOMIC
-      &DIAGONALIZATION
-        ALGORITHM STANDARD
-      &END DIAGONALIZATION
-      &MIXING
-        METHOD BROYDEN_MIXING
-        ALPHA 0.4
-        BETA 0.5
-        NBROYDEN 8
-      &END MIXING
+      SCF_GUESS    ATOMIC
+
+      &OT ON
+        PRECONDITIONER FULL_SINGLE_INVERSE
+        MINIMIZER DIIS
+        ENERGY_GAP 30
+	STEPSIZE 0.75
+	N_HISTORY_VEC 2
+      &END OT
+    
     &END SCF
 
     &XC
@@ -45,25 +47,19 @@
 
   &SUBSYS
     &CELL
-      ABC 7.527791 7.520283 4.286130
-      ANGLES 90.00 90.00 120.18
+      ABC 12.38 12.38 12.38
     &END CELL
 
-    &COORD
-      U 3.775707 2.137188 3.214598
-      U 0.012430 4.314621 1.071533
-      Cl 1.960058 4.535432 3.214598
-      Cl 4.577383 3.977498 1.071533
-      Cl 1.772946 1.985228 1.071533
-      Cl -0.831039 2.521968 3.214598
-      Cl -1.148209 5.942991 3.214598
-      Cl 4.912297 0.565978 1.071533
-    &END COORD
+    @INCLUDE '../coord.inp'
 
     &KIND U
       ELEMENT U
       BASIS_SET DZVP-MOLOPT-GTH-q14
       POTENTIAL GTH-PBE-q14
+      &DFT_PLUS_U on
+        L            3             ! Angular momentum quantum number, 3 for f orbitals
+        U_MINUS_J    4.0*0.03675   ! 4.0 eV → 0.147 Ha
+      &END DFT_PLUS_U
     &END KIND
 
     &KIND Cl
@@ -72,9 +68,4 @@
       POTENTIAL GTH-PBE-q7
     &END KIND
   &END SUBSYS
-
-  &PRINT
-    &TOTAL_NUMBERS   ON
-    &END TOTAL_NUMBERS
-  &END PRINT
 &END FORCE_EVAL

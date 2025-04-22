@@ -1,13 +1,13 @@
 #!/bin/bash
  
-cutoffs="50 100 150 200 250 300 350 400 450 500"
+cutoffs="250 300 350 400 450 500 550 600 650 700 750 800 850 900"
  
 basis_file=BASIS_SET
 potential_file=GTH_POTENTIALS
 template_file=template.inp
 input_file=ucl3.inp
  
-rel_cutoff=120
+rel_cutoff=60
  
 for ii in $cutoffs ; do
     work_dir=cutoff_${ii}Ry
