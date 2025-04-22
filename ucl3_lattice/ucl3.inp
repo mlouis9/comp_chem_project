@@ -29,21 +29,11 @@
 
       &OT ON
         PRECONDITIONER FULL_SINGLE_INVERSE
-        MINIMIZER CG
-        ENERGY_GAP 0.1
-        STEPSIZE 0.05
+        MINIMIZER DIIS
+        ENERGY_GAP 1
+	    STEPSIZE 0.5
       &END OT
-
-      &OUTER_SCF
-        MAX_SCF 10
-        EPS_SCF 1.0E-7
-      &END OUTER_SCF
     
-      &MIXING
-        METHOD BROYDEN_MIXING
-        ALPHA 0.2
-        NBROYDEN 8
-      &END MIXING
     &END SCF
 
     &XC
