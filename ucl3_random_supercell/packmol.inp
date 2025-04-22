@@ -1,0 +1,8 @@
+tolerance 2.0
+filetype xyz
+output ucl3_random.xyz
+
+structure ucl3.xyz
+  number 1
+  inside box 0. 0. 0. 10 10 10
+end structure
