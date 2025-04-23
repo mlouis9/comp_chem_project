@@ -8,14 +8,14 @@
   METHOD Quickstep
   &DFT
     BASIS_SET_FILE_NAME BASIS_MOLOPT
-    POTENTIAL_FILE_NAME GTH_POTENTIALS
+    BASIS_SET_FILE_NAME BASIS_MOLOPT_AcPP1
+    POTENTIAL_FILE_NAME CUSTOM_POTENTIALS
     PLUS_U_METHOD LOWDIN
-    UKS T
 
     &MGRID
       NGRIDS 4
-      CUTOFF 300
-      REL_CUTOFF 50
+      CUTOFF 450
+      REL_CUTOFF 60
     &END MGRID
 
     &QS
@@ -23,15 +23,21 @@
     &END QS
 
     &SCF
-      EPS_SCF      1.0E-7
-      MAX_SCF      200
-      SCF_GUESS    ATOMIC
+      EPS_SCF      1.0E-6
+      MAX_SCF      10
+      SCF_GUESS    RESTART
+
+      &OUTER_SCF
+        EPS_SCF   1.0E-6 
+        MAX_SCF   50
+        OPTIMIZER DIIS
+      &END OUTER_SCF
 
       &OT ON
         PRECONDITIONER FULL_SINGLE_INVERSE
         MINIMIZER DIIS
-        ENERGY_GAP 1
-	    STEPSIZE 0.5
+        ENERGY_GAP 100000
+	STEPSIZE   5.0
       &END OT
     
     &END SCF
@@ -45,15 +51,15 @@
 
   &SUBSYS
     &CELL
-      ABC 12.4 12.4 12.4
+      ABC 12.38 12.38 12.38
     &END CELL
 
     @INCLUDE 'coord.inp'
 
     &KIND U
       ELEMENT U
-      BASIS_SET DZVP-MOLOPT-GTH-q14
-      POTENTIAL GTH-PBE-q14
+      BASIS_SET DZVP-MOLOPT-GTH-q24
+      POTENTIAL GTH-PBE-q24
       &DFT_PLUS_U on
         L            3             ! Angular momentum quantum number, 3 for f orbitals
         U_MINUS_J    4.0*0.03675   ! 4.0 eV → 0.147 Ha
