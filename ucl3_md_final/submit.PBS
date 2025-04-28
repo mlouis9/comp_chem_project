@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -l select=20:ncpus=48:mpiprocs=12
+#PBS -N dataset_generation
+#PBS -l walltime=64:00:00
+#PBS -j oe
+#PBS -P edu_res
+
+cat $PBS_NODEFILE
+
+source ~/.bashrc
+module load mpich
+module load cp2k
+
+export OMP_NUM_THREADS=4
+cd $PBS_O_WORKDIR
+
+mpirun --hostfile $PBS_NODEFILE -n 120 -ppn 4 cp2k.psmp -i ucl3.inp > ucl3.out 2>&1

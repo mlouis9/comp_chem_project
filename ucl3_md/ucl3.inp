@@ -8,14 +8,14 @@
   &MD
     ENSEMBLE NVT
     STEPS 10000              ! 10000 steps × 2 fs = 20 ps
-    TIMESTEP 0.002           ! 2 fs
+    TIMESTEP 2               ! 2 fs
     TEMPERATURE 1250
     &THERMOSTAT
       TYPE AD_LANGEVIN
-      REGION GLOBAL
+      REGION MASSIVE
       &AD_LANGEVIN
-        TIMECON_LANGEVIN 100.0    ! 100 fs → moderate friction
-        TIMECON_NH        1000.0   ! 1 ps → gentle Nose–Hoover chain
+        TIMECON_LANGEVIN   10.0   ! 10 fs → strong, per-atom coupling
+        TIMECON_NH        100.0   ! 100 fs → moderate chain coupling
       &END AD_LANGEVIN
     &END THERMOSTAT
   &END MD
@@ -23,6 +23,7 @@
   &PRINT
     &TRAJECTORY
       FORMAT XYZ
+      FILENAME  ucl3_md.xyz
       &EACH
         MD 10
       &END EACH
@@ -52,21 +53,21 @@
     &END QS
 
     &SCF
-      EPS_SCF      1.0E-6
+      EPS_SCF      1.5E-6
       MAX_SCF      10
       SCF_GUESS    RESTART
 
       &OUTER_SCF
-        EPS_SCF   1.0E-6 
-        MAX_SCF   50
+        EPS_SCF   1.5E-6 
+        MAX_SCF   50000
         OPTIMIZER DIIS
       &END OUTER_SCF
 
       &OT ON
         PRECONDITIONER FULL_SINGLE_INVERSE
         MINIMIZER DIIS
-        ENERGY_GAP 100000
-	STEPSIZE   5.0
+        ENERGY_GAP 1
+	    STEPSIZE   0.8
       &END OT
     
     &END SCF
